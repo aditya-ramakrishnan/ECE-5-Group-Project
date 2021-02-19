@@ -51,9 +51,11 @@ void setup() {
 void loop() {
   enterGUI();
   if(listenMode == 1) {
+    listenMode = 0;
     trackTitle();
     homeButton();
-    listenMode = 0;
+    playButton();
+    shuffleButtons();
   }
 }
 
@@ -105,5 +107,32 @@ void homeButton() {
   tft.fillRect(130, 190, 60, 50, tft.color565(0, 87, 52));
   tft.fillRect(135, 195, 50, 40, tft.color565(0, 255, 100));
   tft.fillRect(145, 213, 30, 20, tft.color565(255, 255, 255));
-  tft.fillTriangle(150, 197, 140, 213, 170, 213, tft.color565(255, 255, 255));
+  tft.fillTriangle(159, 197, 140, 213, 178, 213, tft.color565(255, 255, 255));
+}
+
+void playButton(){
+  tft.fillRect(130, 100, 60, 50, tft.color565(99, 99, 96));
+  tft.fillRect(135, 105, 50, 40, tft.color565(168, 168, 165));
+  tft.fillTriangle(140, 110, 140, 140, 180, 125, tft.color565(255, 255, 255));
+}
+
+void pauseButton() {
+  tft.fillRect(130, 100, 60, 50, tft.color565(99, 99, 96));
+  tft.fillRect(135, 105, 50, 40, tft.color565(168, 168, 165));
+  tft.fillRect(145, 110, 10, 30, tft.color565(255, 255, 255));
+  tft.fillRect(165, 110, 10, 30, tft.color565(255, 255, 255));
+}
+
+void shuffleButtons() {
+  //forward
+  tft.fillRect(230, 100, 60, 50, tft.color565(99, 99, 96));
+  tft.fillRect(235, 105, 50, 40, tft.color565(168, 168, 165));
+  tft.fillTriangle(240, 110, 240, 140, 280, 125, tft.color565(255, 255, 255));
+  tft.fillRect(276, 110, 5, 30, tft.color565(255, 255, 255));
+
+  //backward
+  tft.fillRect(30, 100, 60, 50, tft.color565(99, 99, 96));
+  tft.fillRect(35, 105, 50, 40, tft.color565(168, 168, 165));
+  tft.fillTriangle(40, 125, 77, 140, 77, 110, tft.color565(255, 255, 255));
+  tft.fillRect(40, 110, 5, 30, tft.color565(255, 255, 255));
 }
