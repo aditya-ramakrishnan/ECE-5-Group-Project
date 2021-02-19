@@ -25,6 +25,7 @@ URTouch ts(t_SCK, t_CS, t_DIN, t_DO, t_IRQ);
 //y-axis: 0 to 240
 
 int listenMode = 0;
+int playPauseTracker = 1;
 int x, y;
 
 void setup() {
@@ -49,17 +50,18 @@ void setup() {
 }
 
 void loop() {
-  enterGUI();
+  switchScreens();
   if(listenMode == 1) {
     listenMode = 2;
     trackTitle();
     homeButton();
-    playButton();
+    playOrPause();
     shuffleButtons();
+    volumeBar(); 
   }
 }
 
-void enterGUI() {
+void switchScreens() {
   if (listenMode == 0) {
     while(ts.dataAvailable()){
       ts.read();                      
@@ -67,16 +69,39 @@ void enterGUI() {
       y = ts.getY();
       if((x>=58) && (x<=268) && (y>=142) && (y<=192)){                      
         tft.fillScreen(ILI9341_BLACK);
+        listenMode = 1;
+        return;
       }
-      else {
-        break;
-      }
-      listenMode = 1;
-      return;
     }
+  }
+  else if (listenMode == 2) {
+      while(ts.dataAvailable()){
+        ts.read();                      
+        x = ts.getX();                 
+        y = ts.getY();
+        if((x>=130) && (x<=190) && (y>=190) && (y<=240)){ //home button check                      
+          homeScreen();
+          listenMode = 0;
+          return;
+        }
+        else if((x>=130) && (x<=190) && (y>=80) && (y<=130)) {  //play/pause button check
+          playPauseTracker *= -1;
+          playOrPause();
+          return;
+        }
+      }
   }
   else {
     return;
+  }
+}
+
+void playOrPause() {
+  if (playPauseTracker > 0) {
+    playButton();
+  }
+  else {
+    pauseButton();
   }
 }
 
@@ -99,7 +124,7 @@ void homeScreen() {
 void trackTitle() {
   tft.setTextColor(ILI9341_WHITE);  
   tft.setTextSize(4);               
-  tft.setCursor(40,50);              
+  tft.setCursor(40,30);              
   tft.print("Track Name"); 
 }
 
@@ -111,28 +136,42 @@ void homeButton() {
 }
 
 void playButton(){
-  tft.fillRect(130, 100, 60, 50, tft.color565(99, 99, 96));
-  tft.fillRect(135, 105, 50, 40, tft.color565(168, 168, 165));
-  tft.fillTriangle(140, 110, 140, 140, 180, 125, tft.color565(255, 255, 255));
+  tft.fillRect(130, 80, 60, 50, tft.color565(99, 99, 96));
+  tft.fillRect(135, 85, 50, 40, tft.color565(168, 168, 165));
+  tft.fillTriangle(140, 90, 140, 120, 180, 105, tft.color565(255, 255, 255));
 }
 
 void pauseButton() {
-  tft.fillRect(130, 100, 60, 50, tft.color565(99, 99, 96));
-  tft.fillRect(135, 105, 50, 40, tft.color565(168, 168, 165));
-  tft.fillRect(145, 110, 10, 30, tft.color565(255, 255, 255));
-  tft.fillRect(165, 110, 10, 30, tft.color565(255, 255, 255));
+  tft.fillRect(130, 80, 60, 50, tft.color565(99, 99, 96));
+  tft.fillRect(135, 85, 50, 40, tft.color565(168, 168, 165));
+  tft.fillRect(145, 90, 10, 30, tft.color565(255, 255, 255));
+  tft.fillRect(165, 90, 10, 30, tft.color565(255, 255, 255));
 }
 
 void shuffleButtons() {
   //forward
-  tft.fillRect(230, 100, 60, 50, tft.color565(99, 99, 96));
-  tft.fillRect(235, 105, 50, 40, tft.color565(168, 168, 165));
-  tft.fillTriangle(240, 110, 240, 140, 280, 125, tft.color565(255, 255, 255));
-  tft.fillRect(276, 110, 5, 30, tft.color565(255, 255, 255));
+  tft.fillRect(230, 80, 60, 50, tft.color565(99, 99, 96));
+  tft.fillRect(235, 85, 50, 40, tft.color565(168, 168, 165));
+  tft.fillTriangle(240, 90, 240, 120, 280, 105, tft.color565(255, 255, 255));
+  tft.fillRect(276, 90, 5, 30, tft.color565(255, 255, 255));
 
   //backward
-  tft.fillRect(30, 100, 60, 50, tft.color565(99, 99, 96));
-  tft.fillRect(35, 105, 50, 40, tft.color565(168, 168, 165));
-  tft.fillTriangle(40, 125, 77, 140, 77, 110, tft.color565(255, 255, 255));
-  tft.fillRect(40, 110, 5, 30, tft.color565(255, 255, 255));
+  tft.fillRect(30, 80, 60, 50, tft.color565(99, 99, 96));
+  tft.fillRect(35, 85, 50, 40, tft.color565(168, 168, 165));
+  tft.fillTriangle(40, 105, 77, 120, 77, 90, tft.color565(255, 255, 255));
+  tft.fillRect(40, 90, 5, 30, tft.color565(255, 255, 255));
+}
+
+void volumeBar() {
+  tft.fillRect(55, 140, 210, 40, tft.color565(99, 99, 96));
+  tft.fillRect(60, 145, 200, 30, tft.color565(168, 168, 165));
+  tft.fillRect(95, 140, 7, 40, tft.color565(99, 99, 96));
+  tft.fillRect(215, 140, 7, 40, tft.color565(99, 99, 96));
+  tft.fillRect(65, 157, 26, 7, tft.color565(255, 255, 255));
+  tft.fillRect(227, 157, 28, 7, tft.color565(255, 255, 255));
+  tft.fillRect(238, 147, 7, 26, tft.color565(255, 255, 255));
+  tft.setTextColor(ILI9341_WHITE);  
+  tft.setTextSize(3);               
+  tft.setCursor(107,150);              
+  tft.print("Volume"); 
 }
