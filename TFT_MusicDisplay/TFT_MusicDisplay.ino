@@ -51,7 +51,7 @@ void setup() {
 void loop() {
   enterGUI();
   if(listenMode == 1) {
-    listenMode = 0;
+    listenMode = 2;
     trackTitle();
     homeButton();
     playButton();
