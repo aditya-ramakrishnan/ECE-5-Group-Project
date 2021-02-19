@@ -33,14 +33,17 @@ void setup() {
   tft.fillScreen(ILI9341_BLACK);
 
   tft.setTextColor(ILI9341_WHITE);  
-  tft.setTextSize(4);               
-  tft.setCursor(80,80);              
+  tft.setTextSize(6);               
+  tft.setCursor(40,70);              
   tft.print("Welcome"); 
 
-  tft.setTextColor(ILI9341_GREEN);  
+  tft.fillRect(58, 142, 210, 50, tft.color565(0, 87, 52));
+  tft.fillRect(63, 147, 200, 40, tft.color565(0, 255, 100));
+  tft.setTextColor(tft.color565(89, 94, 92));  
   tft.setTextSize(2);
-  tft.setCursor(90,160);           
-  tft.print("Shuffle Play");
+  tft.setCursor(73,160);           
+  tft.print("Start Listening");
+  
 
 }
 
