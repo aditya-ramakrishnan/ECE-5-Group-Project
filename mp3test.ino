@@ -11,6 +11,7 @@ uint8_t result;
 void setup()
 {  
   Serial.begin(115200);
+  
   //initialize sd card
   if(!sd.begin(SD_SEL, SPI_FULL_SPEED)) sd.initErrorHalt();
   if(!sd.chdir("/")) sd.errorHalt("sd.chdir");
