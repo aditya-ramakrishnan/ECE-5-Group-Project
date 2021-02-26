@@ -1,3 +1,7 @@
+#include <SPI.h>           // SPI library
+#include <SdFat.h>         // SDFat Library
+#include <vs1053_SdFat.h>  // Mp3 Shield Library
+
 #include <Adafruit_ILI9341.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_GrayOLED.h>
@@ -7,17 +11,17 @@
 #include <URTouch.h>
 #include <URTouchCD.h>
 
-#define TFT_CS 12 
-#define TFT_RST 11  
-#define TFT_DC 10         
-#define TFT_MOSI 9 
-#define TFT_SCK 8             
-#define TFT_MISO 7                    
-#define t_SCK 6              
-#define t_CS 5                
-#define t_DIN 4              
-#define t_DO 3             
-#define t_IRQ 2         
+#define TFT_CS 22 
+#define TFT_RST 24   
+#define TFT_DC 26       
+#define TFT_MOSI 28  
+#define TFT_SCK 30             
+#define TFT_MISO 32                    
+#define t_SCK 34              
+#define t_CS 36                
+#define t_DIN 38              
+#define t_DO 40             
+#define t_IRQ 42         
     
 Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC, TFT_MOSI, TFT_SCK, TFT_RST, TFT_MISO);
 URTouch ts(t_SCK, t_CS, t_DIN, t_DO, t_IRQ);
@@ -28,29 +32,32 @@ int listenMode = 0;
 int playPauseTracker = 1;
 int x, y;
 
+SdFat sd; // Create object to handle SD functions
+vs1053 MP3player; // Create Mp3 library object
+int volumeLevel = 100;
+
 void setup() {
   tft.begin();                     
   tft.setRotation(3);           
  
   ts.InitTouch();                   
   ts.setPrecision(PREC_EXTREME);
-  tft.fillScreen(ILI9341_BLACK);
+  homeScreen();
 
-  tft.setTextColor(ILI9341_WHITE);  
-  tft.setTextSize(6);               
-  tft.setCursor(40,70);              
-  tft.print("Welcome"); 
+  Serial.begin(115200);
+  
+  //initialize sd card
+  if(!sd.begin(SD_SEL, SPI_FULL_SPEED)) sd.initErrorHalt();
+  if(!sd.chdir("/")) sd.errorHalt("sd.chdir");
+  
+  //initialize shield
+  MP3player.begin();
 
-  tft.fillRect(58, 142, 210, 50, tft.color565(0, 87, 52));
-  tft.fillRect(63, 147, 200, 40, tft.color565(0, 255, 100));
-  tft.setTextColor(tft.color565(89, 94, 92));  
-  tft.setTextSize(2);
-  tft.setCursor(73,160);           
-  tft.print("Start Listening");
+  MP3player.setVolume(volumeLevel, volumeLevel);
 }
 
 void loop() {
-  switchScreens();
+  buttonPress();
   if(listenMode == 1) {
     listenMode = 2;
     trackTitle();
@@ -61,7 +68,7 @@ void loop() {
   }
 }
 
-void switchScreens() {
+void buttonPress() {
   if (listenMode == 0) {
     while(ts.dataAvailable()){
       ts.read();                      
@@ -89,6 +96,16 @@ void switchScreens() {
           playOrPause();
           return;
         }
+        else if((x>=60) && (x<=95) && (y>=145) && (y<=175)) { //volume minus button check
+          volumeLevel += 20;
+          MP3player.setVolume(volumeLevel, volumeLevel);
+          return;
+        }
+        else if((x>=225) && (x<=260) && (y>=145) && (y<=175)) { //volume plus button check
+          volumeLevel -= 20;
+          MP3player.setVolume(volumeLevel, volumeLevel);
+          return;
+        }  
       }
   }
   else {
@@ -167,9 +184,9 @@ void volumeBar() {
   tft.fillRect(60, 145, 200, 30, tft.color565(168, 168, 165));
   tft.fillRect(95, 140, 7, 40, tft.color565(99, 99, 96));
   tft.fillRect(215, 140, 7, 40, tft.color565(99, 99, 96));
-  tft.fillRect(65, 157, 26, 7, tft.color565(255, 255, 255));
-  tft.fillRect(227, 157, 28, 7, tft.color565(255, 255, 255));
-  tft.fillRect(238, 147, 7, 26, tft.color565(255, 255, 255));
+  tft.fillRect(65, 157, 26, 7, tft.color565(255, 255, 255));  //minus button
+  tft.fillRect(227, 157, 28, 7, tft.color565(255, 255, 255)); //plus button
+  tft.fillRect(238, 147, 7, 26, tft.color565(255, 255, 255)); //plus button
   tft.setTextColor(ILI9341_WHITE);  
   tft.setTextSize(3);               
   tft.setCursor(107,150);              
