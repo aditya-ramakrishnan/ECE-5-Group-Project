@@ -5,9 +5,6 @@
 SdFat sd; // Create object to handle SD functions
 vs1053 MP3player; // Create Mp3 library object
 
-
-uint8_t result;
-
 void setup()
 {  
   Serial.begin(115200);
@@ -17,14 +14,14 @@ void setup()
   if(!sd.chdir("/")) sd.errorHalt("sd.chdir");
   
   //initialize shield
-  result = MP3player.begin();
+  MP3player.begin();
 
   MP3player.setVolume(100, 100);
   
 }
 void loop()
 {
-  result = MP3player.playTrack(0);
-  result = MP3player.playTrack(1);
-  result = MP3player.playTrack(2);
+  MP3player.playTrack(0);
+  MP3player.playTrack(1);
+  MP3player.playTrack(2);
 }
