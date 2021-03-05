@@ -31,6 +31,7 @@ URTouch ts(t_SCK, t_CS, t_DIN, t_DO, t_IRQ);
 int listenMode = 0;
 int playPauseTracker = 1;
 int x, y;
+int songNum = 1;
 
 SdFat sd; // Create object to handle SD functions
 vs1053 MP3player; // Create Mp3 library object
@@ -65,7 +66,6 @@ void loop() {
 		playOrPause();
 		shuffleButtons();
 		volumeBar();
-		MP3player.playTrack(1); 
 	}
 }
 
@@ -88,25 +88,59 @@ void buttonPress() {
 				x = ts.getX();                 
 				y = ts.getY();
 				if((x>=130) && (x<=190) && (y>=190) && (y<=240)){ //home button check                      
+					MP3player.stopTrack();
 					homeScreen();
 					listenMode = 0;
+					songNum = 1;
+					playPauseTracker = 1;
 					return;
 				}
-				else if((x>=130) && (x<=190) && (y>=80) && (y<=130)) {  //play/pause button check
-					playPauseTracker *= -1;
+				else if((x>=130) && (x<=190) && (y>=80) && (y<=130)) {  //play/pause check
+					playPauseTracker++;
+					if (playPauseTracker == 2) {
+						playSong();
+					}
+					else if ((playPauseTracker%2) == 0) {
+						MP3player.resumeMusic();
+					}
+					else {
+						MP3player.pauseMusic();
+					}
 					playOrPause();
 					return;
 				}
-				else if((x>=60) && (x<=95) && (y>=145) && (y<=175)) { //volume minus button check
-					volumeLevel += 3;
+				else if((x>=60) && (x<=95) && (y>=145) && (y<=175)) { //volume minus check
+					volumeLevel += 2;
 					MP3player.setVolume(volumeLevel, volumeLevel);
 					return;
 				}
-				else if((x>=225) && (x<=260) && (y>=145) && (y<=175)) { //volume plus button check
-					volumeLevel -= 3;
+				else if((x>=225) && (x<=260) && (y>=145) && (y<=175)) { //volume plus check
+					volumeLevel -= 2;
 					MP3player.setVolume(volumeLevel, volumeLevel);
 					return;
-				}  
+				}
+				else if((x>=230) && (x<=290) && (y>=80) && (y<=130)) { //shuffle forward check
+					switch(songNum) {
+						case 3: 
+							songNum = 1;
+							break;
+						default:
+							songNum++;
+							break;
+					}
+					playSong();
+				}
+				else if((x>=30) && (x<=90) && (y>=80) && (y<=130)) { //shuffle backward check
+					switch(songNum) {
+						case 1: 
+							songNum = 3;
+							break;
+						default:
+							songNum--;
+							break;
+					}
+					playSong();
+				}
 			}
 	}
 	else {
@@ -114,12 +148,17 @@ void buttonPress() {
 	}
 }
 
+void playSong() {
+	MP3player.stopTrack();
+	MP3player.playTrack(songNum);
+}
+
 void playOrPause() {
-	if (playPauseTracker > 0) {
-		playButton();
+	if ((playPauseTracker%2) == 0) {
+		pauseButton();
 	}
 	else {
-		pauseButton();
+		playButton();
 	}
 }
 
