@@ -128,7 +128,13 @@ void buttonPress() {
 							songNum++;
 							break;
 					}
+					trackTitle();
+					if (playPauseTracker != 2) {
+						playPauseTracker = 2;
+						playOrPause();
+					}
 					playSong();
+					return;
 				}
 				else if((x>=30) && (x<=90) && (y>=80) && (y<=130)) { //shuffle backward check
 					switch(songNum) {
@@ -139,7 +145,13 @@ void buttonPress() {
 							songNum--;
 							break;
 					}
+					trackTitle();
+					if (playPauseTracker != 2) {
+						playPauseTracker = 2;
+						playOrPause();
+					}
 					playSong();
+					return;
 				}
 			}
 	}
@@ -179,10 +191,21 @@ void homeScreen() {
 }
 
 void trackTitle() {
+	tft.fillRect(220, 30, 30, 30, tft.color565(0, 0, 0));
 	tft.setTextColor(ILI9341_WHITE);  
 	tft.setTextSize(4);               
-	tft.setCursor(40,30);              
-	tft.print("Track Name"); 
+	tft.setCursor(80,30);
+	switch(songNum) {
+		case 1: 
+			tft.print("Track 1");
+			break;
+		case 2: 
+			tft.print("Track 2");
+			break;
+		case 3: 
+			tft.print("Track 3");
+			break;
+	}               
 }
 
 void homeButton() {
